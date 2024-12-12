@@ -1,0 +1,23 @@
+# .github/workflows/push-to-prod.yml
+name: Push to Production
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  push-to-prod:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Push to Production
+      env:
+        PROD_TOKEN: ${{ secrets.PROD_TOKEN }}
+      run: |
+        git remote add prod https://x-access-token:${PROD_TOKEN}@github.com/prod-org/prod-repo.git
+        git push prod staging:main --force
